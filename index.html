@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111d27"><title>City Drive — Steering Lab</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="world" aria-label="3D driving practice ground"></canvas>
+<div id="hud" hidden>
+ <header><div class="brand"><span class="eyebrow">CITY DRIVE / 01</span><strong>Steering Lab</strong></div><div class="mission"><span class="eyebrow">PRACTICE OBJECTIVE</span><b id="objective">Park inside the mint bay</b></div><button id="pause">Pause II</button></header>
+ <div class="speed"><b id="speed">0</b><span>KM/H</span><small id="gearText">DRIVE</small></div>
+ <div class="telemetry"><span id="steerText">WHEELS 0°</span><span id="hits">0 contacts</span><span id="status">Free practice · no timer</span></div>
+ <div class="controls"><div class="wheel-wrap"><div id="wheel" role="slider" tabindex="0" aria-label="Steering wheel" aria-valuemin="-135" aria-valuemax="135" aria-valuenow="0"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="85" fill="#122431ed" stroke="#5e727d" stroke-width="18"/><circle cx="100" cy="100" r="74" fill="none" stroke="#243d4a" stroke-width="3"/><path d="M26 84 L85 99 L94 180 L110 180 L117 99 L174 84" fill="none" stroke="#90a3aa" stroke-width="14"/><circle cx="100" cy="100" r="26" fill="#233b48" stroke="#b9cfce" stroke-width="2"/><path d="M92 15 H108" stroke="#b8f1c3" stroke-width="7"/><text x="100" y="106" text-anchor="middle" font-size="15" fill="#dff9e9">CD</text></svg></div><small>STEER · DRAG TO TURN</small></div>
+ <div class="drive-controls"><div class="gears"><button data-gear="1" class="selected">D</button><button data-gear="-1">R</button><button id="camera">View</button></div><div class="pedals"><button data-pedal="brake" class="brake">BRAKE<span>▰</span></button><button data-pedal="gas" class="gas">GO<span>▥</span></button></div></div></div>
+</div>
+<dialog id="menu"><div class="eyebrow">AN ORIGINAL DRIVING PROTOTYPE</div><h1>Find your<br><em>driving feel.</em></h1><p>One car. An open practice ground.<br>Steer smoothly, line up, and park.</p><button id="start" class="primary">START DRIVING →</button><p class="hint">Desktop: WASD / arrows · R switches gear · Space brakes<br>Phone: drag wheel + hold GO · D / R selects direction</p><small>PREVIEW BUILD 0.1 · No accounts or purchases</small></dialog>
+<dialog id="panel"><h2>Make it feel right.</h2><label>Steering response <input id="response" aria-label="Steering response" type="range" min="2" max="10" step="1" value="6"></label><label>Return to centre <input id="return" aria-label="Return to centre" type="range" min="1" max="8" step="1" value="4"></label><label>Engine sound <input id="sound" type="checkbox" checked></label><p>Stop before switching D / R. Hold your car fully inside the mint bay for two seconds to park. Driving backwards reverses the turning direction.</p><button id="resume" class="primary">RESUME</button><button id="reset">Reset car & challenge</button><small>Change these sliders, then tell us how the steering feels.</small></dialog>
+<div id="toast" role="status"></div><div id="error" hidden>Unable to start the game. Please reload in a current browser.</div>
+<script defer src="js/physics.js"></script><script defer src="js/renderer.js"></script><script defer src="js/scene.js"></script><script defer src="js/input.js"></script><script defer src="js/audio.js"></script><script defer src="js/game.js"></script>
+</body></html>

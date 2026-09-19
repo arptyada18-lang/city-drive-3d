@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111d27"><title>City Drive — Steering Lab</title>
+<style>
+:root {
+  color-scheme:dark;
+  --mint:#b8f1c3;
+  --glass:#142630e6
+}
+* {
+  box-sizing:border-box
+}
+html,body {
+  margin:0;
+  height:100%;
+  overflow:hidden;
+  overscroll-behavior:none;
+  background:#b7d1db;
+  color:#edf7f4;
+  font-family:Arial,sans-serif
+}
+button,input {
+  font:inherit
+}
+button {
+  cursor:pointer;
+  min-height:44px;
+  border:1px solid #637d87;
+  background:#223946;
+  color:#edf7f4;
+  border-radius:12px;
+  padding:12px 18px
+}
+button:focus-visible,#wheel:focus-visible {
+  outline:3px solid var(--mint)
+}
+button:active,.active {
+  background:#b8f1c3!important;
+  color:#142630!important
+}
+.primary {
+  background:var(--mint);
+  color:#142630;
+  font-weight:bold
+}
+.eyebrow {
+  font-size:10px;
+  letter-spacing:2px;
+  color:#b8f1c3;
+  display:block;
+  margin-bottom:8px
+}
+#world {
+  width:100%;
+  height:100%;
+  display:block;
+  touch-action:none
+}
+#hud {
+  position:fixed;
+  inset:0;
+  pointer-events:none
+}
+#hud button,#wheel {
+  pointer-events:auto
+}
+header {
+  display:flex;
+  align-items:start;
+  justify-content:space-between;
+  gap:12px;
+  padding:max(20px,env(safe-area-inset-top)) 24px 0
+}
+header>div {
+  background:var(--glass);
+  padding:16px 20px;
+  border:1px solid #72888b77;
+  border-radius:16px
+}
+.brand strong {
+  font-size:22px;
+  font-weight:500
+}
+.mission b {
+  font-size:14px
+}
+.speed {
+  position:absolute;
+  right:30px;
+  top:130px;
+  background:var(--glass);
+  border-radius:18px;
+  padding:18px;
+  text-align:center;
+  min-width:106px
+}
+.speed b {
+  font-size:48px;
+  font-weight:400;
+  display:block;
+  line-height:1
+}
+.speed span {
+  font-size:9px;
+  letter-spacing:2px
+}
+.speed small {
+  display:block;
+  color:var(--mint);
+  margin-top:10px
+}
+.telemetry {
+  position:absolute;
+  top:132px;
+  left:24px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  font-size:11px;
+  color:#f1faf5;
+  text-shadow:0 1px 3px #000
+}
+.telemetry span {
+  background:#142630ae;
+  padding:7px 12px;
+  border-radius:6px;
+  width:fit-content
+}
+.controls {
+  position:absolute;
+  bottom:max(20px,env(safe-area-inset-bottom));
+  left:24px;
+  right:24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:end
+}
+.wheel-wrap {
+  text-align:center
+}
+.wheel-wrap small {
+  font-size:9px;
+  letter-spacing:1.5px;
+  display:block;
+  text-shadow:0 1px 3px #000;
+  margin-top:8px
+}
+#wheel {
+  width:clamp(126px,24vw,210px);
+  height:clamp(126px,24vw,210px);
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  border-radius:50%;
+  filter:drop-shadow(0 10px 14px #0006)
+}
+#wheel svg {
+  width:100%;
+  height:100%;
+  display:block
+}
+.gears {
+  display:flex;
+  gap:7px;
+  margin-bottom:10px
+}
+.gears button {
+  min-width:44px;
+  padding:10px
+}
+.gears .selected {
+  background:var(--mint);
+  color:#142630
+}
+.pedals {
+  display:flex;
+  gap:12px;
+  align-items:end
+}
+.pedals button {
+  width:74px;
+  height:110px;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  background:#132932e8;
+  border:2px solid #80969d;
+  font-size:10px;
+  letter-spacing:1px
+}
+.pedals span {
+  display:block;
+  font-size:38px;
+  margin-top:18px
+}
+.pedals .gas {
+  height:135px;
+  border-color:var(--mint)
+}
+dialog {
+  width:min(560px,94vw);
+  max-height:90dvh;
+  overflow:auto;
+  border:1px solid #6a838a;
+  border-radius:24px;
+  padding:36px;
+  background:#142630f2;
+  color:#edf7f4;
+  box-shadow:0 24px 100px #0007
+}
+dialog::backdrop {
+  background:#0a18234d
+}
+h1 {
+  font-size:clamp(38px,6vw,62px);
+  font-weight:500;
+  line-height:1.05;
+  letter-spacing:-2px;
+  margin:25px 0
+}
+h1 em {
+  color:var(--mint);
+  font-style:normal
+}
+dialog p {
+  color:#c2d1d4;
+  line-height:1.6
+}
+dialog .primary {
+  width:100%;
+  margin:16px 0
+}
+.hint,dialog small {
+  font-size:11px;
+  line-height:1.6
+}
+dialog small {
+  display:block;
+  color:#a9bfbd
+}
+dialog label {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  padding:16px 0;
+  border-bottom:1px solid #fff2
+}
+input[type=range] {
+  width:140px;
+  accent-color:var(--mint)
+}
+#reset {
+  width:100%;
+  margin-bottom:16px
+}
+#toast {
+  position:fixed;
+  left:50%;
+  top:35%;
+  transform:translateX(-50%);
+  max-width:85vw;
+  padding:16px 24px;
+  background:#142630ee;
+  border:1px solid var(--mint);
+  border-radius:12px;
+  text-align:center;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .15s
+}
+#toast.show {
+  opacity:1
+}
+#error {
+  position:fixed;
+  inset:20%;
+  padding:40px;
+  background:#142630;
+  color:#fff
+}
+[hidden] {
+  display:none!important
+}
+@media(max-width:600px) {
+  header {
+  padding:12px;
+  gap:7px
+}
+header>div {
+  padding:10px
+}
+.brand strong {
+  font-size:16px
+}
+.eyebrow {
+  font-size:8px;
+  letter-spacing:1px
+}
+.mission {
+  position:absolute;
+  top:83px;
+  left:12px
+}
+.mission b {
+  font-size:11px
+}
+header button {
+  font-size:11px;
+  padding:10px
+}
+.speed {
+  top:150px;
+  right:12px;
+  min-width:75px;
+  padding:12px
+}
+.speed b {
+  font-size:34px
+}
+.telemetry {
+  left:12px;
+  top:153px;
+  font-size:9px
+}
+.controls {
+  left:12px;
+  right:12px
+}
+.pedals button {
+  width:60px
+}
+.gears button {
+  padding:8px
+}
+.wheel-wrap small {
+  font-size:8px
+}
+dialog {
+  padding:24px
+}
+
+}
+@media(max-height:500px) {
+  header {
+  padding:10px 16px
+}
+header>div {
+  padding:9px 14px
+}
+.brand strong {
+  font-size:16px
+}
+.mission {
+  position:static
+}
+.speed {
+  top:85px;
+  right:16px;
+  padding:8px
+}
+.speed b {
+  font-size:30px
+}
+.telemetry {
+  top:85px;
+  left:16px;
+  font-size:9px
+}
+.controls {
+  bottom:12px
+}
+#wheel {
+  width:140px;
+  height:140px
+}
+.pedals button {
+  height:75px
+}
+.pedals .gas {
+  height:95px
+}
+.pedals span {
+  font-size:24px;
+  margin-top:8px
+}
+.gears {
+  margin-bottom:5px
+}
+h1 {
+  font-size:38px;
+  margin:12px 0
+}
+dialog {
+  padding:22px
+}
+dialog p {
+  margin:8px 0
+}
+
+}
+
+
+</style>
+</head>
+<body>
+<canvas id="world" aria-label="3D driving practice ground"></canvas>
+<div id="hud" hidden>
+ <header><div class="brand"><span class="eyebrow">CITY DRIVE / 01</span><strong>Steering Lab</strong></div><div class="mission"><span class="eyebrow">PRACTICE OBJECTIVE</span><b id="objective">Park inside the mint bay</b></div><button id="pause">Pause II</button></header>
+ <div class="speed"><b id="speed">0</b><span>KM/H</span><small id="gearText">DRIVE</small></div>
+ <div class="telemetry"><span id="steerText">WHEELS 0°</span><span id="hits">0 contacts</span><span id="status">Free practice · no timer</span></div>
+ <div class="controls"><div class="wheel-wrap"><div id="wheel" role="slider" tabindex="0" aria-label="Steering wheel" aria-valuemin="-135" aria-valuemax="135" aria-valuenow="0"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="85" fill="#122431ed" stroke="#5e727d" stroke-width="18"/><circle cx="100" cy="100" r="74" fill="none" stroke="#243d4a" stroke-width="3"/><path d="M26 84 L85 99 L94 180 L110 180 L117 99 L174 84" fill="none" stroke="#90a3aa" stroke-width="14"/><circle cx="100" cy="100" r="26" fill="#233b48" stroke="#b9cfce" stroke-width="2"/><path d="M92 15 H108" stroke="#b8f1c3" stroke-width="7"/><text x="100" y="106" text-anchor="middle" font-size="15" fill="#dff9e9">CD</text></svg></div><small>STEER · DRAG TO TURN</small></div>
+ <div class="drive-controls"><div class="gears"><button data-gear="1" class="selected">D</button><button data-gear="-1">R</button><button id="camera">View</button></div><div class="pedals"><button data-pedal="brake" class="brake">BRAKE<span>▰</span></button><button data-pedal="gas" class="gas">GO<span>▥</span></button></div></div></div>
+</div>
+<dialog id="menu"><div class="eyebrow">AN ORIGINAL DRIVING PROTOTYPE</div><h1>Find your<br><em>driving feel.</em></h1><p>One car. An open practice ground.<br>Steer smoothly, line up, and park.</p><button id="start" class="primary">START DRIVING →</button><p class="hint">Desktop: WASD / arrows · R switches gear · Space brakes<br>Phone: drag wheel + hold GO · D / R selects direction</p><small>PREVIEW BUILD 0.1 · No accounts or purchases</small></dialog>
+<dialog id="panel"><h2>Make it feel right.</h2><label>Steering response <input id="response" aria-label="Steering response" type="range" min="2" max="10" step="1" value="6"></label><label>Return to centre <input id="return" aria-label="Return to centre" type="range" min="1" max="8" step="1" value="4"></label><label>Engine sound <input id="sound" type="checkbox" checked></label><p>Stop before switching D / R. Hold your car fully inside the mint bay for two seconds to park. Driving backwards reverses the turning direction.</p><button id="resume" class="primary">RESUME</button><button id="reset">Reset car & challenge</button><small>Change these sliders, then tell us how the steering feels.</small></dialog>
+<div id="toast" role="status"></div><div id="error" hidden>Unable to start the game. Please reload in a current browser.</div>
+<script>
+'use strict';
+window.CD =  {
+}
+;
+CD.clamp = (n,a,b) => Math.max(a,Math.min(b,n));
+CD.approach = (a,b,rate,dt) => a+(b-a)*(1-Math.exp(-rate*dt));
+// Metres, seconds and radians. Bicycle steering has a stable turning radius
+// at parking speeds; speed-sensitive steering avoids abrupt high-speed turns.
+CD.Car = class  {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    Object.assign(this, {
+      x:0,z:20,yaw:0,speed:0,steer:0,gear:1,contacts:0,cooldown:0,wheelSpin:0
+    }
+    );
+  }
+  corners(x=this.x,z=this.z) {
+    const s=Math.sin(this.yaw),c=Math.cos(this.yaw);
+    return [[-.92,-2.05],[.92,-2.05],[.92,2.05],[-.92,2.05]].map(([dx,dz])=>( {
+      x:x+c*dx-s*dz,z:z+s*dx+c*dz
+    }
+    ));
+  }
+  overlaps(box) {
+    // SAT between oriented car rectangle and axis-aligned scenery rectangle.
+    const points=this.corners(),other=[ {
+      x:box.x-box.w/2,z:box.z-box.d/2
+    }
+    , {
+      x:box.x+box.w/2,z:box.z-box.d/2
+    }
+    , {
+      x:box.x+box.w/2,z:box.z+box.d/2
+    }
+    , {
+      x:box.x-box.w/2,z:box.z+box.d/2
+    }
+    ];
+    const axes=[[1,0],[0,1],[Math.cos(this.yaw),Math.sin(this.yaw)],[-Math.sin(this.yaw),Math.cos(this.yaw)]];
+    return axes.every(([x,z])=> {
+      const a=points.map(p=>p.x*x+p.z*z),b=other.map(p=>p.x*x+p.z*z);
+      return Math.max(...a)>Math.min(...b)&&Math.max(...b)>Math.min(...a);
+    }
+    );
+  }
+  update(dt,input,settings,obstacles) {
+    this.cooldown=Math.max(0,this.cooldown-dt);
+    const target=input.steer*(.61/(1+Math.abs(this.speed)*.045));
+    this.steer=CD.approach(this.steer,target,Math.abs(input.steer)>.01?settings.response:settings.returnRate,dt);
+    if(input.gas)this.speed+=this.gear*3.6*dt;
+    if(input.brake) {
+      const reduction=8.5*dt;
+      this.speed=Math.sign(this.speed)*Math.max(0,Math.abs(this.speed)-reduction);
+    }
+    this.speed*=Math.exp(-(input.gas?.11:.42)*dt);
+    if(Math.abs(this.speed)<.025&&!input.gas)this.speed=0;
+    this.speed=CD.clamp(this.speed,-5.2,15);
+    const previous= {
+      x:this.x,z:this.z,yaw:this.yaw
+    }
+    ;
+    this.yaw+=this.speed/2.65*Math.tan(this.steer)*dt;
+    this.x+=Math.sin(this.yaw)*this.speed*dt;
+    this.z-=Math.cos(this.yaw)*this.speed*dt;
+    const collision=this.corners().some(p=>Math.abs(p.x)>36||Math.abs(p.z)>42)||obstacles.some(b=>this.overlaps(b));
+    if(collision) {
+      Object.assign(this,previous);
+      if(Math.abs(this.speed)>.3&&this.cooldown===0) {
+        this.contacts++;
+        this.cooldown=.8;
+      }
+      this.speed=0;
+    }
+    this.wheelSpin+=this.speed*dt/.34;
+    return collision;
+  }
+  changeGear(gear) {
+    if(Math.abs(this.speed)>.35)return false;
+    this.gear=gear;
+    this.speed=0;
+    return true;
+  }
+  parked(bay) {
+    return Math.abs(this.speed)<.15&&Math.abs(Math.sin(this.yaw-bay.yaw))<.13&&this.corners().every(p=>Math.abs(p.x-bay.x)<bay.w/2&&Math.abs(p.z-bay.z)<bay.d/2);
+  }
+}
+;
+
+</script><script>
+'use strict';
+// Small dependency-free perspective renderer. Geometry is genuinely 3D;
+// Canvas fills depth-sorted faces. Designed for a small low-poly practice scene.
+CD.Renderer=class {
+  constructor(canvas) {
+    this.canvas=canvas;
+    this.ctx=canvas.getContext('2d');
+    this.resize();
+  }
+  resize() {
+    this.w=innerWidth;
+    this.h=innerHeight;
+    this.dpr=Math.min(devicePixelRatio||1,1.5);
+    this.canvas.width=this.w*this.dpr;
+    this.canvas.height=this.h*this.dpr;
+  }
+  camera(position,target) {
+    this.eye=position;
+    const d=target.map((v,i)=>v-position[i]),length=Math.hypot(...d);
+    this.forward=d.map(v=>v/length);
+    const [x,,z]=this.forward,n=Math.hypot(x,z);
+    this.right=[-z/n,0,x/n];
+    const a=this.right,b=this.forward;
+    this.up=[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+    this.focal=Math.min(this.w*1.15,this.h*1.05);
+  }
+  project(v) {
+    const d=v.map((n,i)=>n-this.eye[i]),dot=a=>d.reduce((s,n,i)=>s+n*a[i],0),z=dot(this.forward);
+    return  {
+      x:this.w/2+dot(this.right)*this.focal/z,y:this.h*.43-dot(this.up)*this.focal/z,z
+    }
+    ;
+  }
+  polygon(points,color) {
+    // Clip to the camera near plane instead of dropping whole ground tiles.
+    const depth=v=>v.reduce((sum,n,i)=>sum+(n-this.eye[i])*this.forward[i],0);
+    const clipped=[];
+    for(let i=0;
+    i<points.length;
+    i++) {
+      const a=points[i],b=points[(i+1)%points.length],da=depth(a),db=depth(b);
+      if(da>=.3)clipped.push(a);
+      if((da>=.3)!==(db>=.3)) {
+        const t=(.3-da)/(db-da);
+        clipped.push(a.map((n,j)=>n+(b[j]-n)*t));
+      }
+    }
+    if(clipped.length<3)return;
+    const p=clipped.map(v=>this.project(v));
+    this.faces.push( {
+      p,color,depth:p.reduce((n,v)=>n+v.z,0)/p.length
+    }
+    );
+  }
+  box(x,y,z,w,h,d,color,yaw=0) {
+    const co=Math.cos(yaw),si=Math.sin(yaw);
+    const verts=[[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1],[-1,1,-1],[1,1,-1],[1,1,1],[-1,1,1]].map(([a,b,c])=>[x+co*a*w/2-si*c*d/2,y+b*h/2,z+si*a*w/2+co*c*d/2]);
+    const ids=[[4,5,6,7],[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7]];
+    for(let i=0;
+    i<ids.length;
+    i++)this.polygon(ids[i].map(j=>verts[j]),CD.shade(color,[1.12,.86,.72,.8,.96][i]));
+  }
+  plane(x,z,w,d,color,y=.012) {
+    this.polygon([[x-w/2,y,z-d/2],[x+w/2,y,z-d/2],[x+w/2,y,z+d/2],[x-w/2,y,z+d/2]],color);
+  }
+  flush() {
+    const c=this.ctx;
+    this.faces.sort((a,b)=>b.depth-a.depth);
+    for(const f of this.faces) {
+      c.fillStyle=f.color;
+      c.beginPath();
+      f.p.forEach((v,i)=>i?c.lineTo(v.x,v.y):c.moveTo(v.x,v.y));
+      c.closePath();
+      c.fill();
+    }
+    this.faces=[];
+  }
+  begin() {
+    const c=this.ctx;
+    c.setTransform(this.dpr,0,0,this.dpr,0,0);
+    const sky=c.createLinearGradient(0,0,0,this.h);
+    sky.addColorStop(0,'#80b4cf');
+    sky.addColorStop(.6,'#dce5db');
+    sky.addColorStop(1,'#8caa90');
+    c.fillStyle=sky;
+    c.fillRect(0,0,this.w,this.h);
+    this.faces=[];
+  }
+}
+;
+CD.shade=(hex,n)=>'#'+[1,3,5].map(i=>Math.min(255,Math.round(parseInt(hex.slice(i,i+2),16)*n)).toString(16).padStart(2,'0')).join('');
+
+</script><script>
+'use strict';
+CD.Scene=class {
+  constructor() {
+    this.bay= {
+      x:11,z:-20,w:3.6,d:6.4,yaw:0
+    }
+    ;
+    this.obstacles=[ {
+      x:-11,z:-4,w:6,d:12
+    }
+    , {
+      x:22,z:8,w:5,d:13
+    }
+    ,...[-22,-14,-6,2].map(x=>( {
+      x,z:-30,w:1,d:1
+    }
+    ))];
+    this.decor=[];
+    for(let i=0;
+    i<14;
+    i++)this.decor.push( {
+      x:i%2?-44:44,z:-65+Math.floor(i/2)*20,w:12,h:8+(i*7)%16,d:13,color:['#d5c7ad','#83a1a8','#ba9e88','#acc0b7'][i%4]
+    }
+    );
+  }
+  draw(r,car,parked) {
+    // Tiled ground ensures nearby pavement remains visible across the near plane.
+    for(let x=-70;
+    x<80;
+    x+=10)for(let z=-80;
+    z<90;
+    z+=10)r.plane(x,z,10.03,10.03,Math.abs(x)<36&&Math.abs(z)<42?'#59656a':'#819b78');
+    r.flush();
+    for(let z=-38;
+    z<40;
+    z+=5) {
+      r.plane(0,z,.13,2.4,'#e9d9a1');
+      r.plane(-32,z,.15,4,'#c5ccc4');
+      r.plane(32,z,.15,4,'#c5ccc4');
+    }
+    for(let i=0;
+    i<5;
+    i++) {
+      const x=7+i*4;
+      r.plane(x,-20,.10,6.5,'#dde3d2');
+      r.plane(x+2,-23.2,4,.10,'#dde3d2');
+    }
+    const b=this.bay;
+    r.plane(b.x,b.z,b.w,b.d,parked?'#e5d28a':'#8bbda5');
+    r.flush();
+    // Car shadow is a flat translucent-looking painted silhouette.
+    r.plane(car.x+.25,car.z+.35,2.4,4.8,'#394950');
+    r.flush();
+    for(const b of this.decor) {
+      r.box(b.x,b.h/2,b.z,b.w,b.h,b.d,b.color);
+      for(let y=3;
+      y<b.h;
+      y+=4)r.box(b.x+(b.x>0?-6.03:6.03),y,b.z,.08,1.8,8,'#4e7081');
+    }
+    for(const b of this.obstacles) {
+      r.box(b.x,.12,b.z,b.w,.24,b.d,'#d4cfb8');
+      if(b.w>2) {
+        r.box(b.x,.3,b.z,b.w-.4,.25,b.d-.4,'#92ab79');
+        for(let dz=-b.d/3;
+        dz<=b.d/3;
+        dz+=b.d/3) {
+          r.box(b.x,1,b.z+dz,.3,1.6,.3,'#7e6953');
+          r.box(b.x,2.3,b.z+dz,2.3,2.4,2.3,'#678e70');
+        }
+      }
+      else {
+        r.box(b.x,.4,b.z,.5,.8,.5,'#ea9b62');
+        r.box(b.x,.42,b.z,.53,.18,.53,'#eef0d9');
+      }
+    }
+    for(let z=-40;
+    z<=40;
+    z+=8)for(const x of [-36,36]) {
+      r.box(x,.3,z,.35,.6,7.9,'#c6c6b6');
+    }
+    for(let x=-32;
+    x<=32;
+    x+=8)for(const z of [-42,42])r.box(x,.3,z,7.9,.6,.35,'#c6c6b6');
+    for(const x of [-27,28]) {
+      r.box(x,3,-35,.15,6,.15,'#485f6b');
+      r.box(x,5.8,-34,2.2,.2,.7,'#e6ddbd');
+    }
+    this.drawCar(r,car);
+    r.flush();
+  }
+  drawCar(r,p) {
+    const s=Math.sin(p.yaw),c=Math.cos(p.yaw);
+    const part=(x,y,z,w,h,d,color,angle=0)=>r.box(p.x+c*x-s*z,y,p.z+s*x+c*z,w,h,d,color,p.yaw+angle);
+    part(0,.64,0,1.76,.62,4.05,'#ce7952');
+    part(0,.99,-.3,1.7,.23,3.5,'#e49a72');
+    part(0,1.34,.25,1.48,.65,1.95,'#273f4e');
+    part(0,1.69,.3,1.51,.13,1.75,'#dc9067');
+    part(0,1.35,-.76,1.35,.45,.05,'#8cbbcd');
+    part(0,1.32,1.25,1.35,.4,.06,'#567f92');
+    for(const x of [-.89,.89]) {
+      part(x,.38,-1.25,.25,.67,.65,'#26343e',p.steer);
+      part(x,.38,1.25,.25,.67,.65,'#26343e');
+      part(x*1.025,.38,-1.25,.025,.31,.31,'#bcc8c7',p.steer);
+      part(x*1.025,.38,1.25,.025,.31,.31,'#bcc8c7');
+      part(x*.98,1.25,-.45,.25,.15,.27,'#dc9067');
+    }
+    for(const x of [-.57,.57]) {
+      part(x,.8,-2.04,.48,.16,.04,'#f4efce');
+      part(x,.8,2.04,.46,.17,.04,p.braking?'#ff5844':'#ad453b');
+    }
+    part(0,.47,-2.05,1.1,.16,.05,'#2b424c');
+    part(0,.59,2.06,.45,.16,.04,'#dae5d8');
+  }
+}
+;
+
+</script><script>
+'use strict';
+CD.Input=class {
+  constructor(game) {
+    this.g=game;
+    this.keys=new Set();
+    this.pedals=new Map();
+    this.wheel=document.getElementById('wheel');
+    this.angle=0;
+    this.pointer=null;
+    const reset=()=>this.clear();
+    addEventListener('blur',()=> {
+      reset();
+      game.pause();
+    }
+    );
+    document.addEventListener('visibilitychange',()=> {
+      if(document.hidden) {
+        reset();
+        game.pause();
+      }
+    }
+    );
+    addEventListener('keydown',e=> {
+      if(['INPUT','BUTTON'].includes(e.target.tagName))return;
+      if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyW','KeyS','KeyA','KeyD'].includes(e.code)) {
+        e.preventDefault();
+        if(!game.paused)this.keys.add(e.code);
+      }
+      if(e.repeat)return;
+      if(e.code==='KeyR')game.gear(-game.car.gear);
+      if(e.code==='KeyC')game.view=1-game.view;
+      if(e.code==='Escape'||e.code==='KeyP')game.paused?game.resume():game.pause();
+    }
+    );
+    addEventListener('keyup',e=>this.keys.delete(e.code));
+    this.wheel.addEventListener('pointerdown',e=> {
+      if(game.paused||this.pointer!==null)return;
+      e.preventDefault();
+      this.pointer=e.pointerId;
+      this.previous=this.polar(e);
+      this.wheel.setPointerCapture(e.pointerId);
+      game.audio.start();
+    }
+    );
+    this.wheel.addEventListener('pointermove',e=> {
+      if(this.pointer!==e.pointerId)return;
+      const a=this.polar(e);
+      let delta=a-this.previous;
+      if(delta>180)delta-=360;
+      if(delta< -180)delta+=360;
+      this.angle=CD.clamp(this.angle+delta,-135,135);
+      this.previous=a;
+    }
+    );
+    const release=e=> {
+      if(this.pointer===e.pointerId)this.pointer=null;
+    }
+    ;
+    for(const event of ['pointerup','pointercancel','lostpointercapture'])this.wheel.addEventListener(event,release);
+    for(const b of document.querySelectorAll('[data-pedal]')) {
+      b.addEventListener('pointerdown',e=> {
+        if(game.paused)return;
+        e.preventDefault();
+        b.setPointerCapture(e.pointerId);
+        this.pedals.set(e.pointerId,b.dataset.pedal);
+        b.classList.add('active');
+        game.audio.start();
+      }
+      );
+      const up=e=> {
+        this.pedals.delete(e.pointerId);
+        b.classList.remove('active');
+      }
+      ;
+      for(const name of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(name,up);
+      b.addEventListener('contextmenu',e=>e.preventDefault());
+    }
+  }
+  polar(e) {
+    const r=this.wheel.getBoundingClientRect();
+    return Math.atan2(e.clientY-r.top-r.height/2,e.clientX-r.left-r.width/2)*180/Math.PI;
+  }
+  update(dt) {
+    const left=this.keys.has('KeyA')||this.keys.has('ArrowLeft'),right=this.keys.has('KeyD')||this.keys.has('ArrowRight');
+    if(this.pointer===null)this.angle=CD.approach(this.angle,((right?1:0)-(left?1:0))*135,left||right?this.g.settings.response:this.g.settings.returnRate,dt);
+    this.wheel.querySelector('svg').style.transform=`rotate(${this.angle}deg)`;
+    this.wheel.setAttribute('aria-valuenow',String(Math.round(this.angle)));
+    return  {
+      steer:this.angle/135,gas:this.keys.has('KeyW')||this.keys.has('ArrowUp')||[...this.pedals.values()].includes('gas'),brake:this.keys.has('KeyS')||this.keys.has('ArrowDown')||this.keys.has('Space')||[...this.pedals.values()].includes('brake')
+    }
+    ;
+  }
+  clear() {
+    this.keys.clear();
+    this.pedals.clear();
+    this.pointer=null;
+    this.angle=0;
+    document.querySelectorAll('[data-pedal]').forEach(b=>b.classList.remove('active'));
+  }
+}
+;
+
+</script><script>
+'use strict';
+CD.Audio=class {
+  start() {
+    try {
+      if(!this.ctx) {
+        this.ctx=new(window.AudioContext||window.webkitAudioContext)();
+        this.osc=this.ctx.createOscillator();
+        this.gain=this.ctx.createGain();
+        this.osc.type='triangle';
+        this.osc.connect(this.gain);
+        this.gain.connect(this.ctx.destination);
+        this.gain.gain.value=0;
+        this.osc.start();
+      }
+      this.ctx.resume().catch(()=> {
+      }
+      );
+    }
+    catch {
+      this.ctx=null;
+    }
+  }
+  update(speed,on) {
+    if(!this.ctx)return;
+    try {
+      this.osc.frequency.setTargetAtTime(40+Math.abs(speed)*7,this.ctx.currentTime,.1);
+      this.gain.gain.setTargetAtTime(on?.035:0,this.ctx.currentTime,.05);
+    }
+    catch {
+    }
+  }
+}
+;
+
+</script><script>
+'use strict';
+CD.Game=class {
+  constructor() {
+    this.car=new CD.Car();
+    this.scene=new CD.Scene();
+    this.renderer=new CD.Renderer(document.getElementById('world'));
+    this.settings= {
+      response:6,returnRate:4,sound:true
+    }
+    ;
+    try {
+      const d=JSON.parse(localStorage.getItem('city-drive-settings'));
+      if(d) {
+        for(const key of ['response','returnRate'])if(Number.isFinite(d[key]))this.settings[key]=CD.clamp(d[key],1,10);
+        this.settings.sound=d.sound!==false;
+      }
+    }
+    catch {
+    }
+    this.audio=new CD.Audio();
+    this.started=false;
+    this.paused=true;
+    this.input=new CD.Input(this);
+    this.view=0;
+    this.cameraYaw=0;
+    this.cameraX=0;
+    this.cameraZ=20;
+    this.last=0;
+    this.acc=0;
+    this.parkTime=0;
+    this.complete=false;
+    this.uiTime=0;
+    this.toastTimer=0;
+    const $=id=>document.getElementById(id);
+    this.menu=$('menu');
+    this.panel=$('panel');
+    this.menu.showModal();
+    $('start').onclick=()=> {
+      this.started=true;
+      this.menu.close();
+      $('hud').hidden=false;
+      this.resume();
+      this.toast('Turn the wheel gently. D = forward · R = reverse');
+    }
+    ;
+    $('pause').onclick=()=>this.pause();
+    $('resume').onclick=()=>this.resume();
+    $('reset').onclick=()=> {
+      this.car.reset();
+      this.parkTime=0;
+      this.complete=false;
+      this.cameraYaw=0;
+      this.cameraX=0;
+      this.cameraZ=20;
+      this.resume();
+    }
+    ;
+    $('camera').onclick=()=> {
+      this.view=1-this.view;
+      document.activeElement?.blur();
+    }
+    ;
+    document.querySelectorAll('[data-gear]').forEach(b=>b.onclick=()=> {
+      this.gear(Number(b.dataset.gear));
+      b.blur();
+    }
+    );
+    for(const[id,key]of [['response','response'],['return','returnRate']]) {
+      const el=$(id);
+      el.value=this.settings[key];
+      el.oninput=()=> {
+        this.settings[key]=Number(el.value);
+        this.saveSettings();
+      }
+      ;
+    }
+    $('sound').checked=this.settings.sound;
+    $('sound').onchange=()=> {
+      this.settings.sound=$('sound').checked;
+      this.saveSettings();
+    }
+    ;
+    this.menu.addEventListener('cancel',e=>e.preventDefault());
+    this.panel.addEventListener('cancel',e=> {
+      e.preventDefault();
+      this.resume();
+    }
+    );
+    addEventListener('resize',()=>this.renderer.resize());
+    requestAnimationFrame(t=>this.frame(t));
+  }
+  saveSettings() {
+    try {
+      localStorage.setItem('city-drive-settings',JSON.stringify(this.settings));
+    }
+    catch {
+      this.toast('Settings cannot be saved in this browser');
+    }
+  }
+  pause() {
+    if(!this.started)return;
+    this.paused=true;
+    this.input.clear();
+    this.audio.update(0,false);
+    if(!this.panel.open)this.panel.showModal();
+  }
+  resume() {
+    if(!this.started)return;
+    this.paused=false;
+    this.panel.close();
+    this.input.clear();
+    document.activeElement?.blur();
+    this.audio.start();
+  }
+  gear(g) {
+    if(this.paused)return;
+    if(!this.car.changeGear(g))this.toast('Brake to a stop before changing gear');
+    this.updateHUD();
+  }
+  toast(message) {
+    const el=document.getElementById('toast');
+    el.textContent=message;
+    el.classList.add('show');
+    clearTimeout(this.toastTimer);
+    this.toastTimer=setTimeout(()=>el.classList.remove('show'),2600);
+  }
+  step(dt) {
+    const control=this.input.update(dt),old=this.car.contacts;
+    this.car.braking=control.brake;
+    this.car.update(dt,control,this.settings,this.scene.obstacles);
+    if(this.car.contacts>old)this.toast('Contact — brake earlier and leave more space');
+    if(!this.complete) {
+      this.parkTime=this.car.parked(this.scene.bay)?this.parkTime+dt:0;
+      if(this.parkTime>=2) {
+        this.complete=true;
+        this.toast('PARKED! Smooth finish. Keep practising or reset.');
+      }
+    }
+  }
+  updateHUD() {
+    document.getElementById('speed').textContent=Math.round(Math.abs(this.car.speed)*3.6);
+    document.getElementById('gearText').textContent=this.car.gear===1?'DRIVE':'REVERSE';
+    document.getElementById('steerText').textContent='WHEELS '+Math.round(this.car.steer*180/Math.PI)+'°';
+    document.getElementById('hits').textContent=this.car.contacts+' contacts';
+    document.getElementById('objective').textContent=this.complete?'Parked ✓ · Try a cleaner approach':'Park inside the mint bay';
+    document.getElementById('status').textContent=this.parkTime>0&&!this.complete?'Hold still · '+Math.min(100,Math.round(this.parkTime/2*100))+'%':'Free practice · no timer';
+    document.querySelectorAll('[data-gear]').forEach(b=>b.classList.toggle('selected',Number(b.dataset.gear)===this.car.gear));
+  }
+  frame(t) {
+    const dt=Math.min(.05,(t-this.last)/1000||0);
+    this.last=t;
+    if(!this.paused) {
+      this.acc+=dt;
+      while(this.acc>=1/120) {
+        this.step(1/120);
+        this.acc-=1/120;
+      }
+    }
+    else this.acc=0;
+    let delta=Math.atan2(Math.sin(this.car.yaw-this.cameraYaw),Math.cos(this.car.yaw-this.cameraYaw));
+    this.cameraYaw+=delta*(1-Math.exp(-5*dt));
+    this.cameraX=CD.approach(this.cameraX,this.car.x,9,dt);
+    this.cameraZ=CD.approach(this.cameraZ,this.car.z,9,dt);
+    const distance=this.view?14:10,height=this.view?19:4.5,s=Math.sin(this.cameraYaw),c=Math.cos(this.cameraYaw);
+    this.renderer.camera([this.cameraX-s*distance,height,this.cameraZ+c*distance],[this.cameraX+s*6,.6,this.cameraZ-c*6]);
+    this.renderer.begin();
+    this.scene.draw(this.renderer,this.car,this.complete);
+    this.audio.update(this.car.speed,!this.paused&&this.settings.sound);
+    this.uiTime+=dt;
+    if(this.uiTime>.1) {
+      this.updateHUD();
+      this.uiTime=0;
+    }
+    requestAnimationFrame(stamp=>this.frame(stamp));
+  }
+}
+;
+try {
+  window.cityDrive=new CD.Game();
+}
+catch(error) {
+  document.getElementById('error').hidden=false;
+  console.error(error);
+}
+
+</script>
+</body></html>
